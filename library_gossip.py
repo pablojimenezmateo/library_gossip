@@ -1,3 +1,4 @@
+#!/usr/bin/python
 from twitter import *
 import os.path
 
@@ -21,11 +22,31 @@ twitter = Twitter(auth=OAuth(oauth_token, oauth_secret, CONSUMER_KEY, CONSUMER_S
 
 
 
-## Get followers and add as friends
-fr = twitter.followers.ids()
-followers =  fr['ids']
+## Get followers and add as friends (Autofollow)
+fo = twitter.followers.ids()
+followers =  fo['ids']
+
+##Get friends
+fr = twitter.friends.ids()
+friends = fr['ids']
+
+## Pending friend requests
+og = twitter.friendships.outgoing()
+pending = og['ids']
+
 for i in followers:
-	twitter.friendships.create(user_id=i)
+	
+	#If I haven't added them yet
+	if (i not in pending and i not in friends):
+		twitter.friendships.create(user_id=i)
+##Get my tweets
+mt = twitter.statuses.user_timeline(screen_name = 'library_gossip',count = 50)
+mytweets =[]
+
+##Get text only
+mt_len = len(mt)
+for i in range(mt_len):
+	mytweets.append(mt[i]['text'])
 
 ## Read direct messages
 dm = twitter.direct_messages()
@@ -36,7 +57,7 @@ for i in range(dm_len):
 	OP = dm[i]['sender_id']
 	ID = dm[i]['id']
 
-	## Check length
+	## Check length of the message
 	if len(text) > 118:
 		
 		##Send a message back
@@ -44,8 +65,15 @@ for i in range(dm_len):
 	else:
 		##Post gossip
 		msg = 'A birdie told me that ' + text
-		print msg
-		twitter.statuses.update(status = msg)
+
+		#Check for duplicates
+		if (msg not in mytweets):
+			print msg
+			twitter.statuses.update(status = msg)
+		else:
+			##Send a message back
+			twitter.direct_messages.new(user_id=OP, text='Message duplicated.')
+			print 'Message duplicated'
 
 	##Delete direct msg
 	twitter.direct_messages.destroy( _id=ID )
