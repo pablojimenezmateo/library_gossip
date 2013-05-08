@@ -7,13 +7,16 @@ import os.path
 #As soon as the app has the credentials on an account it creates this file
 MY_TWITTER_CREDS = os.path.expanduser('~/.library_credentials')
 
-#Personal API keys
-CONSUMER_KEY='wvVkXNQ5DbclWozoaFmMg'
-CONSUMER_SECRET='CjeNjHDklYdsG2upkeTwKjJ0BmF4yOuv90MsKgUji18'
+#Personal API keys (You should put your key here)
+CONSUMER_KEY=''
+CONSUMER_SECRET=''
+
+#The screen name of the account that the bot will use
+BOT_NAME=''
 
 #Ask for credentials
 if not os.path.exists(MY_TWITTER_CREDS):
-	    oauth_dance('Library talk', CONSUMER_KEY, CONSUMER_SECRET,
+	    oauth_dance(BOT_NAME, CONSUMER_KEY, CONSUMER_SECRET,
 	                    MY_TWITTER_CREDS)
 
 oauth_token, oauth_secret = read_token_file(MY_TWITTER_CREDS)
